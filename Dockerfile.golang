@@ -1,0 +1,21 @@
+# Construção de imagem go utilizando multistages
+
+# Passo 1 - Compilação de fonte utilizando imagem do golang no Linux Alpine
+FROM golang:alpine AS builder
+
+# Definindo diretorio de trabalho
+WORKDIR /var/www
+# Copiando fonte para imagem
+COPY ./.docker/golang/codeeducation.go .
+
+# Compilando fonte
+RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/codeeducation
+
+# Passo 2 - Construção de imagem com binário GO utilizando imagem "pura" (scratch)
+FROM scratch
+
+# Copiando binário da imagem builder
+COPY --from=builder /go/bin/codeeducation /go/bin/codeeducation
+
+# Definindo entrypoint para execução do binário
+ENTRYPOINT ["/go/bin/codeeducation"]

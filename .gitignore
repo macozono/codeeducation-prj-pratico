@@ -1,3 +1,4 @@
 vendor
-.env
 .docker/dbdata
+.env
+!.docker/app/*
